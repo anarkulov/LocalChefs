@@ -1,0 +1,105 @@
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.aar
+
+# Xcode
+xcuserdata/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Kotlin/Native
+konan/
+kotlin-native-*.tar.gz
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Build generated
+build/
+bin/
+gen/
+out/
+
+# Local configuration
+local.properties
+*.local
+
+# Log Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Android Profiling
+*.hprof
+
+# CocoaPods
+Pods/
+*.xcworkspace
+!default.xcworkspace
+Podfile.lock
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+*.xcodeproj
+.swiftpm
+
+# KMM specific
+shared/build/
+shared/.gradle/
+shared/.idea/
+shared/*.iml
+shared/local.properties 
