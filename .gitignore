@@ -5,6 +5,13 @@ gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
 
+# Kotlin/Native and KMM build artifacts
+*.klib
+.kotlinc/
+.kotlin/
+build/
+.gradle/
+
 # Android Studio
 .idea/
 *.iml
@@ -73,6 +80,12 @@ out/
 # Local configuration
 local.properties
 *.local
+.env
+*.env
+secrets.properties
+*.keystore
+google-services.json
+GoogleService-Info.plist
 
 # Log Files
 *.log
@@ -102,4 +115,23 @@ shared/build/
 shared/.gradle/
 shared/.idea/
 shared/*.iml
-shared/local.properties 
+shared/local.properties
+
+# IDE specific
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~.nib
+
+# Supabase
+supabase.json
+supabase-credentials.json 

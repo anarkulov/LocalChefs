@@ -47,6 +47,12 @@ kotlin {
             // KMP-NativeCoroutines
             implementation(libs.kmp.nativecoroutines.core)
             implementation(libs.kmp.nativecoroutines.annotations)
+
+            // Supabase
+            implementation(platform("io.github.jan-tennert.supabase:bom:3.0.0"))
+            implementation("io.github.jan-tennert.supabase:auth-kt")
+            implementation("io.github.jan-tennert.supabase:postgrest-kt")
+            implementation("io.github.jan-tennert.supabase:realtime-kt")
         }
         
         androidMain.dependencies {

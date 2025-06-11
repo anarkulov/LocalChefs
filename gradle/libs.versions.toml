@@ -10,6 +10,7 @@ androidx-core = "1.16.0"
 androidx-espresso = "3.6.1"
 androidx-lifecycle = "2.9.0"
 androidx-testExt = "1.2.1"
+bom = "1.4.7"
 composeMultiplatform = "1.8.1"
 junit = "4.13.2"
 kotlin = "2.1.21"
@@ -20,6 +21,8 @@ kmpObservableViewmodel = "1.0.0-BETA-10"
 kmpNativeCoroutines = "1.0.0-ALPHA-41"
 
 [libraries]
+bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "bom" }
+gotrue-kt = { module = "io.github.jan-tennert.supabase:gotrue-kt" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -53,6 +56,8 @@ kmp-observable-viewmodel = { module = "com.rickclephas.kmp:kmp-observableviewmod
 # KMP-NativeCoroutines
 kmp-nativecoroutines-core = { module = "com.rickclephas.kmp:kmp-nativecoroutines-core", version.ref = "kmpNativeCoroutines" }
 kmp-nativecoroutines-annotations = { module = "com.rickclephas.kmp:kmp-nativecoroutines-annotations", version.ref = "kmpNativeCoroutines" }
+realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
+postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
