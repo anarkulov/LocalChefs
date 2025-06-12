@@ -34,15 +34,15 @@ kotlin {
             implementation(libs.ktor.client.json)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
-            
+
             // Kotlinx Serialization
             implementation(libs.kotlinx.serialization.json)
-            
+
             // Koin
             implementation(libs.koin.core)
             
             // KMP-ObservableViewModel
-            implementation(libs.kmp.observable.viewmodel)
+            api(libs.kmp.observable.viewmodel)
             
             // KMP-NativeCoroutines
             implementation(libs.kmp.nativecoroutines.core)
@@ -50,9 +50,9 @@ kotlin {
 
             // Supabase
             implementation(platform("io.github.jan-tennert.supabase:bom:3.0.0"))
-            implementation("io.github.jan-tennert.supabase:auth-kt")
-            implementation("io.github.jan-tennert.supabase:postgrest-kt")
-            implementation("io.github.jan-tennert.supabase:realtime-kt")
+            implementation(libs.auth.kt)
+            implementation(libs.supabase.postgrest.kt)
+            implementation(libs.supabase.realtime.kt)
         }
         
         androidMain.dependencies {
