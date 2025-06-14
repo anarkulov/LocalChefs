@@ -4,7 +4,7 @@ import com.rickclephas.kmp.observableviewmodel.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.localchefs.app.shared.domain.usecase.GetChefsUseCase
+import org.localchefs.app.shared.domain.usecase.chefProfile.GetChefsUseCase
 import org.localchefs.app.shared.presentation.state.ChefProfileState
 
 class ChefProfileViewModel(

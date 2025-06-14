@@ -14,7 +14,7 @@ struct ChefListView: View {
                     .foregroundColor(.red)
                     .padding()
             } else {
-                List(viewModel.state.chefs, id: \ .id) { chef in
+                List(viewModel.state.chefs, id: \.id) { chef in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(chef.name ?? "Unnamed Chef")
                             .font(.headline)
@@ -32,5 +32,17 @@ struct ChefListView: View {
             viewModel.loadChefs()
         }
         .navigationTitle("Chefs")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    NavigationLink(destination: DietaryTagListView()) {
+                        Text("Dietary Tags")
+                    }
+                    NavigationLink(destination: FoodAllergenListView()) {
+                        Text("Food Allergens")
+                    }
+                }
+            }
+        }
     }
 } 

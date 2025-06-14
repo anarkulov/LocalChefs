@@ -70,6 +70,7 @@ android {
 
 dependencies {
     implementation(libs.core.ktx)
+    implementation(libs.androidx.navigation.compose.android)
     debugImplementation(compose.uiTooling)
 }
 
