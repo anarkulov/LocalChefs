@@ -20,6 +20,13 @@ class ReviewApi(private val supabaseClient: SupabaseClient) {
         return result?.toDomain()
     }
 
+    suspend fun getByChefId(id: String): Review? {
+        val result = supabaseClient.from("reviews").select {
+            filter { eq("chefId", id) }
+        }.decodeSingleOrNull<ReviewDto>()
+        return result?.toDomain()
+    }
+
     suspend fun insert(review: Review): Review? {
         val dto = review.toDto()
         val result = supabaseClient.from("reviews").insert(dto).decodeSingleOrNull<ReviewDto>()

@@ -1,4 +1,5 @@
 [versions]
+accompanistSystemuicontrollerVersion = "0.34.0"
 agp = "8.7.3"
 android-compileSdk = "35"
 android-minSdk = "24"
@@ -25,6 +26,7 @@ kmpNativeCoroutines = "1.0.0-ALPHA-41"
 coreKtx = "1.16.0"
 ktorClientPlugins = "2.3.9"
 navigationComposeAndroid = "2.9.0"
+playServicesLocation = "21.3.0"
 
 [libraries]
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
@@ -73,6 +75,7 @@ core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx"
 supabase-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 androidx-navigation-compose-android = { group = "androidx.navigation", name = "navigation-compose-android", version.ref = "navigationComposeAndroid" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

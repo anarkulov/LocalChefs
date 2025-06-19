@@ -1,6 +1,8 @@
 package org.localchefs.app.shared.presentation.viewmodel
 
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
+import com.rickclephas.kmp.observableviewmodel.ViewModel
+import com.rickclephas.kmp.observableviewmodel.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -8,12 +10,11 @@ import kotlinx.coroutines.flow.update
 import org.localchefs.app.shared.domain.usecase.notification.GetNotificationsUseCase
 import org.localchefs.app.shared.domain.usecase.notification.GetNotificationsByUserIdUseCase
 import org.localchefs.app.shared.presentation.state.NotificationState
-import org.localchefs.app.shared.presentation.ObservableViewModel
 
 class NotificationViewModel(
     private val getNotificationsUseCase: GetNotificationsUseCase,
     private val getNotificationsByUserIdUseCase: GetNotificationsByUserIdUseCase
-) : ObservableViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(NotificationState())
     @NativeCoroutinesState

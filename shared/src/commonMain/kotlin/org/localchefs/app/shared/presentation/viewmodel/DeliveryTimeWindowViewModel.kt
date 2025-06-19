@@ -1,6 +1,8 @@
 package org.localchefs.app.shared.presentation.viewmodel
 
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
+import com.rickclephas.kmp.observableviewmodel.ViewModel
+import com.rickclephas.kmp.observableviewmodel.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -8,12 +10,11 @@ import kotlinx.coroutines.flow.update
 import org.localchefs.app.shared.domain.usecase.delivery.GetDeliveryTimeWindowsUseCase
 import org.localchefs.app.shared.domain.usecase.delivery.GetDeliveryTimeWindowsByChefIdUseCase
 import org.localchefs.app.shared.presentation.state.DeliveryTimeWindowState
-import org.localchefs.app.shared.presentation.ObservableViewModel
 
 class DeliveryTimeWindowViewModel(
     private val getDeliveryTimeWindowsUseCase: GetDeliveryTimeWindowsUseCase,
     private val getDeliveryTimeWindowsByChefIdUseCase: GetDeliveryTimeWindowsByChefIdUseCase
-) : ObservableViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(DeliveryTimeWindowState())
     @NativeCoroutinesState

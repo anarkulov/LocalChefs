@@ -17,11 +17,13 @@ import org.localchefs.app.shared.presentation.viewmodel.ChefProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChefListScreen(
-    onFoodAllergensClick: () -> Unit = {},
-    onDietaryTagsClick: () -> Unit = {}
+    zipCode: String,
+    miles: String,
+    onChefSelected: (String) -> Unit
 ) {
     val viewModel: ChefProfileViewModel = getKoin().get()
     val state by viewModel.state.collectAsState()
+
 
     LaunchedEffect(Unit) {
         viewModel.loadChefs()
@@ -32,12 +34,7 @@ fun ChefListScreen(
         TopAppBar(
             title = { Text("Local Chefs") },
             actions = {
-                TextButton(onClick = onDietaryTagsClick) {
-                    Text("Dietary Tags")
-                }
-                TextButton(onClick = onFoodAllergensClick) {
-                    Text("Food Allergens")
-                }
+
             }
         )
 
@@ -46,6 +43,7 @@ fun ChefListScreen(
                 state.isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
+
                 state.error != null -> {
                     Text(
                         text = state.error ?: "Unknown error",
@@ -53,9 +51,12 @@ fun ChefListScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 else -> {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(state.chefs) { chef ->
@@ -76,7 +77,8 @@ fun ChefListScreen(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Text(
-                                        text = chef.cuisines?.joinToString() ?: "No cuisines listed",
+                                        text = chef.cuisines?.joinToString()
+                                            ?: "No cuisines listed",
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }

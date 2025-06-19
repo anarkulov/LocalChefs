@@ -71,6 +71,7 @@ android {
 dependencies {
     implementation(libs.core.ktx)
     implementation(libs.androidx.navigation.compose.android)
+    implementation(libs.play.services.location)
     debugImplementation(compose.uiTooling)
 }
 

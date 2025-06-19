@@ -25,6 +25,7 @@ captures/
 *.apk
 *.aab
 *.aar
+*.DS_Store
 
 # Xcode
 xcuserdata/
@@ -54,7 +55,7 @@ konan/
 kotlin-native-*.tar.gz
 
 # macOS
-.DS_Store
+*.DS_Store
 .AppleDouble
 .LSOverride
 ._*
