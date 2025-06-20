@@ -32,9 +32,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +50,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.localchefs.app.Constants.Navigation.CART
 import org.localchefs.app.Constants.Navigation.CHEFS
 import org.localchefs.app.Constants.Navigation.HOME
@@ -72,6 +77,7 @@ fun App() {
         val signInButtonInteractionSource = remember { MutableInteractionSource() }
         val isSignInButtonPressed by signInButtonInteractionSource.collectIsPressedAsState()
         var menuExpanded by remember { mutableStateOf(false) }
+        val snackbarHostState = remember { SnackbarHostState() }
 
         val isDarkMode = isSystemInDarkTheme()
 
@@ -91,6 +97,9 @@ fun App() {
         }
 
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(snackbarHostState)
+            },
             topBar = {
                 Row(
                     modifier = Modifier
@@ -230,19 +239,37 @@ fun App() {
 //                            Constants.Navigation.HOW_IT_WORKS -> navController.navigate(Constants.Navigation.HOW_IT_WORKS)
                             }
                         },
-                        onSearchZip = { zipCode, miles ->
+                        onSearchLocation = { latitude, longitude, miles ->
                             navController.navigate(
-                                "${CHEFS}?zipCode=$zipCode&miles=$miles"
+                                "$CHEFS?latitude=$latitude&longitude=$longitude&miles=$miles"
                             )
                         }
                     )
                 }
                 // Add other composable destinations here
-                composable(CHEFS) {
-                    val zipCode = it.arguments?.getString("zipCode") ?: "00000"
-                    val miles = it.arguments?.getString("miles") ?: "0"
+                composable(
+                    route = "$CHEFS?latitude={latitude}&longitude={longitude}&miles={miles}",
+                    arguments = listOf(
+                        navArgument("latitude") {
+                            type = NavType.FloatType
+                            defaultValue = 0f
+                        },
+                        navArgument("longitude") {
+                            type = NavType.FloatType
+                            defaultValue = 0f
+                        },
+                        navArgument("miles") {
+                            type = NavType.IntType
+                            defaultValue = 0
+                        }
+                    )
+                ) {
+                    val latitude = it.arguments?.getFloat("latitude") ?: 0f
+                    val longitude = it.arguments?.getFloat("longitude") ?: 0f
+                    val miles = it.arguments?.getInt("miles") ?: 0
                     ChefListScreen(
-                        zipCode = zipCode,
+                        latitude = latitude,
+                        longitude = longitude,
                         miles = miles,
                         onChefSelected = { chefId ->
                             Toast.makeText(context, "Selected Chef ID: $chefId", Toast.LENGTH_SHORT)

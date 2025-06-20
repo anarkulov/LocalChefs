@@ -1,33 +1,28 @@
 package org.localchefs.app.presentation.screens
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -39,107 +34,126 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.LocationServices
-import org.localchefs.app.Constants.Navigation.CART
+import kotlinx.coroutines.launch
 import org.localchefs.app.Constants.Navigation.CHEFS
-import org.localchefs.app.Constants.Navigation.HOW_IT_WORKS
 import org.localchefs.app.Constants.Navigation.READY_DISHES
-import org.localchefs.app.Constants.Navigation.SIGNIN
-import org.localchefs.app.Constants.Navigation.SIGNUP
 import org.localchefs.app.R
+import org.localchefs.app.domain.location.AndroidGeocoderWrapper
 import org.localchefs.app.rememberImeState
-import java.util.Locale
+import org.localchefs.app.shared.presentation.home.HomeViewModel
 
 @Composable
 fun HomeScreen(
     onNavigationClick: (String) -> Unit,
-    onSearchZip: (String, Int) -> Unit
+    onSearchLocation: (Float, Float, Int) -> Unit
 ) {
-    var milesDropDownMenuExpanded by remember { mutableStateOf(false) }
-    var milesDropDownMenuSelected by remember { mutableIntStateOf(0) }
-    var zipCode by remember { mutableStateOf("") }
-    val imeState = rememberImeState()
+    val context = LocalContext.current
+    val viewModel: HomeViewModel = viewModel()
+    val state by viewModel.state.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+    val imeState = rememberImeState()
 
     val orange = Color(0xFFFF7A00)
     val blueGray = Color(0xFF232F3E)
     val gridBrush = Brush.linearGradient(
-        colors = listOf(blueGray, blueGray.copy(alpha = 0.95f)),
-        start = Offset.Zero, // Top-left
-        end = Offset.Infinite // Effectively bottom-right for the bounds of the canvas
+        colors = listOf(blueGray, blueGray.copy(alpha = 0.9f)),
+        start = Offset.Zero,
+        end = Offset.Infinite
     )
 
-    val context = LocalContext.current
-    var error by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(key1 = imeState.value) {
+        if (imeState.value) scrollState.animateScrollTo(scrollState.maxValue)
+    }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
             if (granted) {
-                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-                fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
-                        if (location != null) {
-                            val geocoder = Geocoder(context, Locale.getDefault())
-                            println("Location: ${location.latitude}, ${location.longitude}")
-
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                                geocoder.getFromLocation(
-                                    location.latitude,
-                                    location.longitude,
-                                    1
-                                ) { addresses: MutableList<Address> ->
-                                    if (addresses.isNotEmpty()) {
-                                        val postalCode = addresses[0].postalCode
-                                        if (postalCode.length == 5) {
-                                            zipCode = postalCode
-                                            error = null
-                                        } else {
-                                            error = "Invalid postal code: $postalCode"
-                                        }
-                                    } else {
-                                        error = "No address found for the location"
-                                    }
-                                }
-                            } else {
-                                val addresses = geocoder.getFromLocation(
-                                    location.latitude,
-                                    location.longitude,
-                                    1
-                                )
-                                if (!addresses.isNullOrEmpty()) {
-                                    val postalCode = addresses[0].postalCode
-                                    if (postalCode.length == 5) {
-                                        zipCode = postalCode
-                                        error = null
-                                    } else {
-                                        error = "Invalid postal code: $postalCode"
-                                    }
-                                } else {
-                                    error = "No address found for the location"
-                                }
-                            }
-                        } else {
-                            error = "Location not available"
-                        }
-                    }
-                    .addOnFailureListener {
-                        error = "Failed to get location: ${it.localizedMessage}"
-                    }
+                coroutineScope.launch {
+                    viewModel.findUserLocation(AndroidGeocoderWrapper(context))
+                }
             } else {
-                error = "Location permission denied"
+                val act = context as Activity
+                if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    viewModel.showRationaleDialog(true)
+                } else {
+                    viewModel.showSettingsDialog(true)
+                }
             }
         }
     )
 
     fun onFindLocationClick() {
-        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        when {
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED -> {
+                coroutineScope.launch {
+                    viewModel.findUserLocation(AndroidGeocoderWrapper(context))
+                }
+            }
+            else -> locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
     }
 
-    LaunchedEffect(key1 = imeState.value) {
-        if (imeState.value) {
-            scrollState.animateScrollTo(scrollState.maxValue, tween(250))
+    fun onFindCoordinatesByZipcode() {
+        coroutineScope.launch {
+            val success = viewModel.searchCoordinatesByZip(
+                zip = state.zipCode,
+                geocoder = AndroidGeocoderWrapper(context)
+            )
+            if (success) viewModel.triggerLocationSearch(onSearchLocation)
         }
+    }
+
+    // loading bar
+    if (state.isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
+    // Dialog
+    if (state.showRationaleDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.showRationaleDialog(false) },
+            title = { Text("Location Permission Needed") },
+            text = { Text("We need your location to find chefs near you.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.showRationaleDialog(false)
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }) { Text("Allow") }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.showRationaleDialog(false) }) { Text("Cancel") }
+            }
+        )
+    }
+    if (state.showSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.showSettingsDialog(false) },
+            title = { Text("Permission Denied") },
+            text = { Text("Please enable location permission in settings.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.showSettingsDialog(false)
+                    context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    })
+                }) { Text("Open Settings") }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.showSettingsDialog(false) }) { Text("Cancel") }
+            }
+        )
     }
 
     Column(
@@ -148,6 +162,7 @@ fun HomeScreen(
             .background(gridBrush)
             .verticalScroll(scrollState)
     ) {
+
         // Hero Section
         Column(
             modifier = Modifier
@@ -233,10 +248,10 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
-                            value = zipCode,
+                            value = state.zipCode,
                             onValueChange = { newValue ->
                                 if (newValue.length <= 5) {
-                                    zipCode = newValue
+                                    viewModel.updateZipCode(newValue)
                                 }
                             },
                             placeholder = {
@@ -267,19 +282,19 @@ fun HomeScreen(
                                 .background(Color.White, shape = RoundedCornerShape(10.dp))
                         ) {
                             TextButton(
-                                onClick = { milesDropDownMenuExpanded = true },
+                                onClick = { viewModel.toggleDistanceMenu() },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                             ) {
                                 Text(
-                                    text = "$milesDropDownMenuSelected miles",
+                                    text = "${state.selectedDistance} miles",
                                     color = Color.Black,
                                     fontSize = 14.sp
                                 )
                             }
                             DropdownMenu(
-                                expanded = milesDropDownMenuExpanded,
-                                onDismissRequest = { milesDropDownMenuExpanded = false },
+                                expanded = state.isDistanceMenuExpanded,
+                                onDismissRequest = { viewModel.toggleDistanceMenu() },
                                 modifier = Modifier.width(120.dp)
                             ) {
                                 listOf(
@@ -291,17 +306,16 @@ fun HomeScreen(
                                     DropdownMenuItem(
                                         text = { Text("$distance miles") },
                                         onClick = {
-                                            milesDropDownMenuSelected = distance
-                                            milesDropDownMenuExpanded = false
+                                            viewModel.setDistance(distance)
                                         }
                                     )
                                 }
                             }
                         }
                     }
-                    if (error != null) {
+                    if (state.error != null) {
                         Text(
-                            text = error ?: "Invalid ZIP Code",
+                            text = state.error!!,
                             color = Color.Red,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(start = 8.dp),
@@ -310,15 +324,17 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Button(
-                            onClick = { onSearchZip(zipCode, milesDropDownMenuSelected) },
+                            onClick = {
+                                onFindCoordinatesByZipcode()
+                            },
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = orange),
-                            enabled = zipCode.length == 5,
+                            enabled = viewModel.isValidZipCode(),
                             modifier = Modifier
                                 .height(56.dp)
                                 .weight(1f)
                         ) {
-                            Text("Search ZIP", color = Color.White)
+                            Text("Search", color = Color.White)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
@@ -347,6 +363,6 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     HomeScreen(
         onNavigationClick = { _ -> },
-        onSearchZip = { _, _ -> }
+        onSearchLocation = { _, _, _ -> }
     )
 }

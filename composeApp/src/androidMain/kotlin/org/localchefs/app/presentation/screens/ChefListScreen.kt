@@ -14,74 +14,63 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.getKoin
 import org.localchefs.app.shared.presentation.viewmodel.ChefProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChefListScreen(
-    zipCode: String,
-    miles: String,
+    latitude: Float,
+    longitude: Float,
+    miles: Int,
     onChefSelected: (String) -> Unit
 ) {
     val viewModel: ChefProfileViewModel = getKoin().get()
     val state by viewModel.state.collectAsState()
 
-
     LaunchedEffect(Unit) {
-        viewModel.loadChefs()
+        viewModel.loadChefs(latitude, longitude, miles)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Top Bar with Food Allergens and Dietary Tags buttons
-        TopAppBar(
-            title = { Text("Local Chefs") },
-            actions = {
-
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            state.isLoading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-        )
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
+            state.error != null -> {
+                Text(
+                    text = state.error ?: "Unknown error",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
-                state.error != null -> {
-                    Text(
-                        text = state.error ?: "Unknown error",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(state.chefs) { chef ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth()
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.chefs) { chef ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = chef.name ?: "Unnamed Chef",
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                    Text(
-                                        text = chef.city ?: "Unknown City",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                    Text(
-                                        text = chef.cuisines?.joinToString()
-                                            ?: "No cuisines listed",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
+                                Text(
+                                    text = chef.name ?: "Unnamed Chef",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = chef.city ?: "Unknown City",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = chef.cuisines?.joinToString()
+                                        ?: "No cuisines listed",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                             }
                         }
                     }
@@ -89,4 +78,4 @@ fun ChefListScreen(
             }
         }
     }
-} 
+}

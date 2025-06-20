@@ -101,6 +101,8 @@ import org.localchefs.app.shared.data.repository.NotificationRepositoryImpl
 import org.localchefs.app.shared.domain.repository.NotificationRepository
 import org.localchefs.app.shared.domain.usecase.availableDish.GetAvailableDishesUseCase
 import org.localchefs.app.shared.domain.usecase.certification.GetCertificationsUseCase
+import org.localchefs.app.shared.domain.usecase.chefProfile.GetChefByIdUseCase
+import org.localchefs.app.shared.domain.usecase.chefProfile.GetChefsByLocationUseCase
 import org.localchefs.app.shared.domain.usecase.chefProfile.GetChefsUseCase
 import org.localchefs.app.shared.domain.usecase.delivery.GetDeliveryTimeWindowsByChefIdUseCase
 import org.localchefs.app.shared.domain.usecase.delivery.GetDeliveryTimeWindowsUseCase
@@ -111,6 +113,7 @@ import org.localchefs.app.shared.domain.usecase.notification.GetNotificationsUse
 import org.localchefs.app.shared.domain.usecase.order.GetOrdersUseCase
 import org.localchefs.app.shared.domain.usecase.profile.GetProfilesUseCase
 import org.localchefs.app.shared.presentation.viewmodel.NotificationViewModel
+import org.localchefs.app.shared.di.homeModule
 
 val networkModule = module {
     single { HttpClientProvider().create() }
@@ -125,7 +128,9 @@ val chefProfileModule = module {
     single { ChefProfileApi(get()) }
     single<ChefProfileRepository> { ChefProfileRepositoryImpl(get()) }
     single { GetChefsUseCase(get()) }
-    single { ChefProfileViewModel(get()) }
+    single { GetChefByIdUseCase(get()) }
+    single { GetChefsByLocationUseCase(get()) }
+    single { ChefProfileViewModel(get(), get()) }
 }
 
 val orderModule = module {
@@ -291,6 +296,7 @@ val sharedModule = module {
         proteinModule,
         certificationTypeModule,
         deliveryTimeWindowModule,
-        notificationModule
+        notificationModule,
+        homeModule
     )
 }

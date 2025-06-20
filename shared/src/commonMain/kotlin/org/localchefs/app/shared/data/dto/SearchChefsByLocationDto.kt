@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SearchChefsByLocationDto(
-    val latitude: Double,
-    val longitude: Double,
-    val radiusMiles: Int
+    val search_lat: Float,
+    val search_lng: Float,
+    val radius_meters: Int
 )

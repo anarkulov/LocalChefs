@@ -27,22 +27,24 @@ class ChefProfileApi(private val supabaseClient: SupabaseClient) {
     }
 
     suspend fun getChefsByLocation(
-        latitude: Double,
-        longitude: Double,
+        latitude: Float,
+        longitude: Float,
         radiusMiles: Int
     ): List<ChefProfile> {
 
         val dto = SearchChefsByLocationDto(
-            latitude = latitude,
-            longitude = longitude,
-            radiusMiles = radiusMiles
+            search_lat = latitude,
+            search_lng = longitude,
+            radius_meters = radiusMiles
         )
 
         val json = Json.encodeToJsonElement(SearchChefsByLocationDto.serializer(), dto) as JsonObject
         val result = supabaseClient.postgrest.rpc(
-            "get_chefs_by_location",
+            "chefs_within_radius",
             json,
         ){}.decodeList<ChefProfileDto>()
+
+        println("getChefsByLocation result: $result")
 
         return result.map { it.toDomain() }
     }
